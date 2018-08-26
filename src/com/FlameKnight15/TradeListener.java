@@ -85,19 +85,6 @@ public class TradeListener implements Listener {
             Inventory inv = player.getOpenInventory().getTopInventory();
 
             InventoryHolder holder = inv.getHolder();
-            //Player playerWhoClosed = (Player) event.getPlayer();
-            //if(inv == holder) {
-/*            List<HumanEntity> viewers = event.getInventory().getViewers();
-            Player tradeInitiator, tradeAccepter;
-            if (tradingPlayers.containsKey((Player) viewers.get(0))) {
-                //Add a check here when extending plugin to make sure no trade viewers are getting items
-                tradeInitiator = (Player) viewers.get(0);
-                tradeAccepter = (Player) viewers.get(1);
-            } else {
-                //Add a check here when extending plugin to make sure no trade viewers are getting items
-                tradeInitiator = (Player) viewers.get(1);
-                tradeAccepter = (Player) viewers.get(0);
-            }*/
 
 
             Player tradeInitiator, tradeAccepter;
@@ -204,7 +191,6 @@ public class TradeListener implements Listener {
                     event.setCancelled(true);
                 }
             }
-            //player.updateInventory();
         }
     }
 
@@ -389,6 +375,10 @@ public class TradeListener implements Listener {
 
     int periodCount;
 
+    /**
+     * Creates a timer for the trade until it completes for a player to cancel
+     * @param inventory Inventory the trade is happening from
+     */
     public void countdownTrade(Inventory inventory) {
         int delay = 0;
         int period = (core.config.getInt("tradeCountdownTime") + 1) * 200;/*core.config.getInt("tradeCountdownTime");*/
@@ -417,18 +407,7 @@ public class TradeListener implements Listener {
                     itemMeta.setDisplayName(ChatColor.GREEN + "Accept Trade");
                     ArrayList<String> itemLore = (ArrayList<String>) item.getItemMeta().getLore();
                     String playerNameColor = "&f";
-/*                    Player tradeInitiator, tradeAccepter;
-                    List<HumanEntity> viewers = inventory.getViewers();
-                    if (tradingPlayers.containsKey((Player) viewers.get(0))) {
-                        //Add a check here when extending plugin to make sure no trade viewers are getting items
-                        tradeInitiator = (Player) viewers.get(0);
-                        tradeAccepter = (Player) viewers.get(1);
-                    } else {
-                        //Add a check here when extending plugin to make sure no trade viewers are getting items
-                        tradeAccepter = (Player) viewers.get(0);
-                        tradeInitiator = (Player) viewers.get(1);
 
-                    }*/
                     itemLore.set(1, core.tradeGUI.parseColors(playerNameColor + tradeInitiator.getName() + ":" + ChatColor.YELLOW + " PROCESSING"));
 
                     itemLore.set(2, core.tradeGUI.parseColors(playerNameColor + tradeAccepter.getName() + ":" + ChatColor.YELLOW + " PROCESSING"));
@@ -464,19 +443,8 @@ public class TradeListener implements Listener {
      * @param inventory
      */
     public void finishTrade(Inventory inventory) {
-        List<HumanEntity> viewers = inventory.getViewers();
         Player tradeInitiator, tradeAccepter;
-        if (tradingPlayers.containsKey((Player) viewers.get(0))) {
-            //Add a check here when extending plugin to make sure no trade viewers are getting items
-            tradeInitiator = (Player) viewers.get(0);
-            tradeAccepter = (Player) viewers.get(1);
-        } else {
-            //Add a check here when extending plugin to make sure no trade viewers are getting items
-            tradeInitiator = (Player) viewers.get(1);
-            tradeAccepter = (Player) viewers.get(0);
-        };
-
-        Inventory inv = tradeInitiator.getOpenInventory().getTopInventory();
+        Inventory inv = inventory;
 
         InventoryHolder holder = inv.getHolder();
 
@@ -484,6 +452,9 @@ public class TradeListener implements Listener {
             return;
 
         CustomHolder tradeInfo = (CustomHolder) holder;
+
+        tradeAccepter = tradeInfo.getAccepter();
+        tradeInitiator = tradeInfo.getInitiator();
 
 
         for (int a = 0; a < traderSlots.size(); a++) {
@@ -523,20 +494,6 @@ public class TradeListener implements Listener {
         Inventory inv = whoClosed.getOpenInventory().getTopInventory();
 
         InventoryHolder holder = inv.getHolder();
-        //Player playerWhoClosed = (Player) event.getPlayer();
-        //if(inv == holder) {
-/*            List<HumanEntity> viewers = event.getInventory().getViewers();
-            Player tradeInitiator, tradeAccepter;
-            if (tradingPlayers.containsKey((Player) viewers.get(0))) {
-                //Add a check here when extending plugin to make sure no trade viewers are getting items
-                tradeInitiator = (Player) viewers.get(0);
-                tradeAccepter = (Player) viewers.get(1);
-            } else {
-                //Add a check here when extending plugin to make sure no trade viewers are getting items
-                tradeInitiator = (Player) viewers.get(1);
-                tradeAccepter = (Player) viewers.get(0);
-            }*/
-
 
             Player tradeInitiator, tradeAccepter;
             if(!(holder instanceof CustomHolder))
@@ -547,16 +504,8 @@ public class TradeListener implements Listener {
             tradeAccepter = tradeInfo.getAccepter();
             tradeInitiator = tradeInfo.getInitiator();
 
-
-
             if(whoClosed == tradeAccepter) {
 
-/*                tradeInitiator.sendMessage(
-                        " " + (tradeInitiator.isOnline())
-                                + " " + (tradeInitiator.getOpenInventory() != null)
-                                + " " + (tradeInitiator.getOpenInventory().getTopInventory() != null)
-                                + " " + tradeInitiator.getOpenInventory().getTopInventory().equals(core.tradeGUI.tradeInventory)
-                );*/
                 if ((tradeInitiator.isOnline()) && (tradeInitiator.getOpenInventory() != null) &&
                         (tradeInitiator.getOpenInventory().getTopInventory() != null) && (tradeInitiator.getOpenInventory().getTopInventory().equals(core.tradeGUI.tradeInventory)) && (tradingPlayers.containsKey(tradeInitiator))) {
                     ItemStack cursor = tradeInitiator.getOpenInventory().getCursor();
@@ -582,33 +531,19 @@ public class TradeListener implements Listener {
                     return;
                 }
             }
-
-            //tradeAccepter.closeInventory();
-            //tradeInitiator.closeInventory();
             returnItems(inv, tradeInitiator, tradeAccepter);
             return;
-        //}
     }
 
+    /**
+     * Returns the items to the player in the trade
+     * @param inventory Inventory that items are being returned from (Trade Inventory)
+     * @param tradeInitiator Player who initiated the trade
+     * @param tradeAccepter Player who accepted the trade
+     */
     public void returnItems(Inventory inventory, Player tradeInitiator, Player tradeAccepter) {
-        //Inventory inventory = event.getInventory();
 
         if (inventory.getName().contains("Trade:")) {
-            List<HumanEntity> viewers = inventory.getViewers();
-            //Player tradeInitiator, tradeAccepter;
-/*            if (tradingPlayers.containsKey((Player) viewers.get(0))) {
-                //Add a check here when extending plugin to make sure no trade viewers are getting items
-                tradeInitiator = (Player) viewers.get(0);
-                tradeAccepter = (Player) viewers.get(1);
-            } else {
-                //Add a check here when extending plugin to make sure no trade viewers are getting items
-                tradeInitiator = (Player) viewers.get(1);
-                tradeAccepter = (Player) viewers.get(0);
-            }*/
-/*          tradeInitiator.sendMessage(tradeInitiator.getOpenInventory().getTopInventory().getTitle());
-            tradeInitiator.sendMessage(tradeAccepter.getOpenInventory().getTopInventory().getTitle());*/
-
-
 
             for (int a = 0; a < traderSlots.size(); a++) {
                 if (inventory.getItem(traderSlots.get(a)) == null || inventory.getItem(traderSlots.get(a)).getType() == Material.AIR || inventory.getItem(traderSlots.get(a)).getAmount() == 0) {
