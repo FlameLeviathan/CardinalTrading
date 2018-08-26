@@ -85,14 +85,16 @@ public class Trade {
         String prefix = parseStringMsg(core.config.getString("chatPrefix"));
         if (tradeInitiator != tradeReceiver) {
             if (getNearbyPlayers(tradeInitiator).contains(tradeReceiver)) {
+                if(!getTradeRequests(tradeInitiator).contains(tradeReceiver)) {
 
-                //Send messages to players informing about trade
-                tradeInitiator.sendMessage(prefix + msgTradeSent);
-                tradeReceiver.sendMessage(prefix + msgTradeReceived);
-                //Add to Hashmap Trade requests tI is 0 tR is 1
-                requestTrade.put(tradeInitiator, tradeReceiver);
-                tradeTimer(tradeInitiator, tradeReceiver);
-                // tradeInitiator.sendMessage(requestTrade.toString());
+                    //Send messages to players informing about trade
+                    tradeInitiator.sendMessage(prefix + msgTradeSent);
+                    tradeReceiver.sendMessage(prefix + msgTradeReceived);
+                    //Add to Hashmap Trade requests tI is 0 tR is 1
+                    requestTrade.put(tradeInitiator, tradeReceiver);
+                    tradeTimer(tradeInitiator, tradeReceiver);
+                    // tradeInitiator.sendMessage(requestTrade.toString());
+                }
             }
         } else {
             tradeInitiator.sendMessage(prefix + msgCannotTradeWithSelf);

@@ -136,7 +136,8 @@ public class TradeListener implements Listener {
                         if (inv.getItem(slotClicked) != null && inv.getItem(slotClicked).getType() == Material.PAPER) {
                             removeMoneyTrade(player, moneyTrades.get(player));
                             event.setCancelled(true);
-                        }
+                        } else
+                            event.setCancelled(true);
                     }
 
                 } else {
@@ -183,7 +184,8 @@ public class TradeListener implements Listener {
                         if(inv.getItem(slotClicked) != null && inv.getItem(slotClicked).getType() == Material.PAPER) {
                             removeMoneyTrade(player, moneyTrades.get(player));
                             event.setCancelled(true);
-                        }
+                        } else
+                            event.setCancelled(true);
                     }
 
 
@@ -443,6 +445,10 @@ public class TradeListener implements Listener {
      * @param inventory
      */
     public void finishTrade(Inventory inventory) {
+
+        String msgTradeSuccess = parseStringMsg(core.config.getString("tradeSuccessMsg"));
+        String prefix = parseStringMsg(core.config.getString("chatPrefix"));
+
         Player tradeInitiator, tradeAccepter;
         Inventory inv = inventory;
 
@@ -483,12 +489,16 @@ public class TradeListener implements Listener {
         }
 
         tradingPlayers.remove(tradeInitiator, tradeAccepter);
+        tradeInitiator.sendMessage(prefix + msgTradeSuccess);
+        tradeAccepter.sendMessage(prefix + msgTradeSuccess);
         tradeInfo.getInitiator().closeInventory();
         tradeInfo.getAccepter().closeInventory();
     }
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
+        String msgTradeCancelled = parseStringMsg(core.config.getString("tradeCancelledMsg"));
+        String prefix = parseStringMsg(core.config.getString("chatPrefix"));
         Player whoClosed = (Player) event.getPlayer();
 
         Inventory inv = whoClosed.getOpenInventory().getTopInventory();
@@ -515,6 +525,7 @@ public class TradeListener implements Listener {
                     tradeInitiator.closeInventory();
                     tradeInitiator.updateInventory();
                     returnItems(inv, tradeInitiator, tradeAccepter);
+                    tradeInitiator.sendMessage(prefix + msgTradeCancelled);
                     return;
                 }
             } else
@@ -528,11 +539,33 @@ public class TradeListener implements Listener {
                     tradeAccepter.closeInventory();
                     tradeAccepter.updateInventory();
                     returnItems(inv, tradeInitiator, tradeAccepter);
+                    tradeAccepter.sendMessage(prefix + msgTradeCancelled);
                     return;
                 }
             }
             returnItems(inv, tradeInitiator, tradeAccepter);
             return;
+    }
+
+    /**
+     * Replaces all custom variables
+     * @param msg Msg to parse variables in
+     * @param replacements Variables in config to be replaced with Convention: Variable:Replacement i.e. PLAYERTRADESENTTO:playerReceiver.getName()
+     * @returnMsg with variables replaced
+     */
+    public String parseStringMsg(String msg, String... replacements){
+        String parsedMsg = msg;
+        //Make second mthd w/o second param
+        //replacements is like Variable:Replacement i.e. PLAYERTRADESENTTO:playerReceiver.getName()
+        for(String s : replacements){
+            String[] replace = s.split(":");
+            if(msg.contains(replace[0])){
+                parsedMsg = msg.replace(replace[0], replace[1]);
+            }
+        }
+        parsedMsg = ChatColor.translateAlternateColorCodes('&', parsedMsg);
+
+        return parsedMsg;
     }
 
     /**
