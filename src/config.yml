@@ -1,0 +1,17 @@
+tradeRadius: 5
+#These are in seconds
+tradeCountdownTime: 5
+tradeRequestTimeout: 5
+#The chat prefix appears before every message
+chatPrefix: "&dCardinalTrading> "
+playerNotOnlineMsg: "&7That player is not online!"
+playerNotNearbyMsg: "&7That player is not within trading distance! Please be within 5 blocks of the player!"
+tradeSentMsg: "&7You have sent a trade request to &b{PLAYERTRADESENTTO} &7! They have &b30 &7seconds to respond!"
+tradeReceivedMsg: "&7You have received a trade request from &b{PLAYERTRADESENTFROM}&7! You have &b30 &7seconds to respond!"
+tradeHasStartedMsg: "&7Your trade has begun!"
+commandIncorrectMsg: "&7You did not use the command correctly! Please use /trade <playername> to initiate or accept a trade!"
+cannotTradeWithSelfMsg: "&7You cannot trade with yourself!"
+#Variables:
+#If a variable is not applicable in that given area, it will just print the variable out and make chat look ugly.
+#{PLAYERTRADESENTTO} = The player that a trade was sent to.
+#{PLAYERTRADESENTFROM} = The player that a trade was sent from.

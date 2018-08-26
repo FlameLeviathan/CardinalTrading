@@ -1,0 +1,9 @@
+name: CardinalTrading
+main: com.FlameKnight15.Core
+version: 1.0
+author: FlameKnight15
+depends: [Vault]
+commands:
+  trade:
+    description: Initiates a trade with another player
+    usage: /trade <player>
