@@ -1,6 +1,6 @@
 name: CardinalTrading
 main: com.FlameKnight15.Core
-version: 1.0
+version: 1.1.5-BETA
 author: FlameKnight15
 depends: [Vault]
 commands:

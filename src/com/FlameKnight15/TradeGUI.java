@@ -12,10 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TradeGUI {
+    Core core;
 
     TradeListener tradeListener;
-    public TradeGUI(TradeListener listener){
+    public TradeGUI(TradeListener listener, Core c){
         tradeListener = listener;
+        core = c;
     }
     ItemStack rejectTrade = editMaterial(Material.BARRIER, ChatColor.RED + "Cancel Trade");
     Inventory tradeInventory;
@@ -28,12 +30,19 @@ public class TradeGUI {
     public void openTrade(Player trader, Player accepter){
         tradeInventory = Bukkit.createInventory(new CustomHolder(trader, accepter), 54, ChatColor.translateAlternateColorCodes('&', "&6Trade: &b" + trader.getName() + " &6& &c" + accepter.getName()));
 
+
+        double amountOne = core.config.getDouble("moneyAmountOne");
+        double amountTwo = core.config.getDouble("moneyAmountTwo");
+        double amountThree = core.config.getDouble("moneyAmountThree");
+        double amountFour = core.config.getDouble("moneyAmountFour");
         //Set items in the trade
+        //TODO: Change the money amount names
         ItemStack blackGlass = new ItemStack(Material.STAINED_GLASS_PANE,1, (byte) 0);
-        ItemStack addFiftyCor = editMaterial(Material.PAPER,ChatColor.GREEN+ "Add 50 Cor");
-        ItemStack addFiveHundredCor = editMaterial(Material.PAPER,ChatColor.GREEN+ "Add 500 Cor");
-        ItemStack removeFiftyCor = editMaterial(Material.PAPER,ChatColor.RED+ "Remove 50 Cor");
-        ItemStack removeFiveHundredCor = editMaterial(Material.PAPER,ChatColor.RED+ "Remove 500 Cor");
+        ItemStack addFiftyCor = editMaterial(Material.PAPER,ChatColor.GREEN+ "Add " +amountOne+" Cor");
+        ItemStack addFiveHundredCor = editMaterial(Material.PAPER,ChatColor.GREEN+ "Add " +amountTwo+" Cor");
+        ItemStack removeFiftyCor = editMaterial(Material.PAPER,ChatColor.GREEN+ "Add " +amountThree+" Cor");
+        ItemStack removeFiveHundredCor = editMaterial(Material.PAPER,ChatColor.GREEN+ "Add " +amountFour+" Cor");
+        ItemStack moneyItem = editMaterial(Material.PAPER,ChatColor.GREEN+ "Cor: 0");
         ItemStack acceptTrade = editMaterial(Material.POISONOUS_POTATO, ChatColor.GREEN + "Accept Trade", "&B&nStatuses:",  ("&f"+trader.getName() + ": &ePROCESSING"),  ("&f"+accepter.getName()+ ": &ePROCESSING"));
 
 
@@ -42,12 +51,14 @@ public class TradeGUI {
         //tradeInventory.setItem(13, blackGlass);
         tradeInventory.setItem(4, addFiftyCor);
         tradeInventory.setItem(13, addFiveHundredCor);
-        tradeInventory.setItem(22, removeFiveHundredCor);
-        tradeInventory.setItem(31, removeFiftyCor);
+        tradeInventory.setItem(31, removeFiveHundredCor);
+        tradeInventory.setItem(22, removeFiftyCor);
         //tradeInventory.setItem(49, blackGlass);
         tradeInventory.setItem(40,acceptTrade);
         rejectTrade.setAmount(1);
         tradeInventory.setItem(49, rejectTrade);
+        tradeInventory.setItem(48, moneyItem);
+        tradeInventory.setItem(50, moneyItem);
 
 
         //REMEMBER TO DO ECONOMY CHECKS

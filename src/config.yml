@@ -1,4 +1,9 @@
 tradeRadius: 5
+#Adjust the money transfer amount below:
+moneyAmountOne: 100
+moneyAmountTwo: 1000
+moneyAmountThree: 10000
+moneyAmountFour: 100000
 #These are in seconds
 tradeCountdownTime: 5
 tradeRequestTimeout: 30
@@ -6,16 +11,20 @@ tradeRequestTimeout: 30
 chatPrefix: "&dCardinalTrading> "
 playerNotOnlineMsg: "&7That player is not online!"
 playerNotNearbyMsg: "&7That player is not within trading distance! Please be within 5 blocks of the player!"
-#Can use {PLAYERTRADESENTTO} placeholder in the below message
-tradeSentMsg: "&7You have sent a trade request to &b{PLAYERTRADESENTTO} &7! They have &b30 &7seconds to respond!"
+#Can use {PLAYERTRADESENTTO} placeholder in the below messages
+tradeSentMsg: "&7You have sent a trade request to &b{PLAYERTRADESENTTO}&7! They have &b30 &7seconds to respond!"
+tradeRequestExpiredMsg: "&7Your trade request to {PLAYERTRADESENTTO} &7has expired!"
+tradeRequestAlreadySentMsg: "&7You have already sent a trade request to {PLAYERTRADESENTTO}&7!"
 #Can use {PLAYERTRADESENTFROM} placeholder in the below message
 tradeReceivedMsg: "&7You have received a trade request from &b{PLAYERTRADESENTFROM}&7! You have &b30 &7seconds to respond!"
 tradeHasStartedMsg: "&7Your trade has begun!"
 commandIncorrectMsg: "&7You did not use the command correctly! Please use /trade <playername> to initiate or accept a trade!"
 cannotTradeWithSelfMsg: "&7You cannot trade with yourself!"
-tradeCancelledMsg: "&7The trade was cancelled!"
+tradeCancelledMsg: "&7The trade was cancelled by {TRADECANCELLEDBY}!"
 tradeSuccessMsg: "&7The trade completed successfully!"
+
 #Variables:
 #If a variable is not applicable in that given area, it will just print the variable out and make chat look ugly.
 #{PLAYERTRADESENTTO} = The player that a trade was sent to.
 #{PLAYERTRADESENTFROM} = The player that a trade was sent from.
+#{TRADECANCELLEDBY} = The player that cancelled the trade.

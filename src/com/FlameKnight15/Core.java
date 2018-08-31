@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,7 +19,7 @@ public class Core extends JavaPlugin {
     public FileConfiguration config = YamlConfiguration.loadConfiguration(cFile);
 
     TradeListener tradeListener = new TradeListener(this);
-    TradeGUI tradeGUI = new TradeGUI(tradeListener);
+    TradeGUI tradeGUI = new TradeGUI(tradeListener, this);
     static Economy econ;
     Trade trade = new Trade(this);
     CommandHandler commandHandler = new CommandHandler(this);
@@ -50,6 +51,10 @@ public class Core extends JavaPlugin {
     public void onDisable(){
         //config = YamlConfiguration.loadConfiguration(cFile);
         config.options().copyDefaults(true);
+        for(Player player : tradeListener.tradingPlayers.keySet()){
+            player.closeInventory();
+            tradeListener.tradingPlayers.get(player).closeInventory();
+        }
 
 
         getLogger().info("onDisable has been initialized!");

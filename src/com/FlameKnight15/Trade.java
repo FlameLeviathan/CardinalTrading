@@ -20,6 +20,7 @@ public class Trade {
     }
 
     HashMap<Player, Player> requestTrade = new HashMap<Player, Player>();
+    HashMap<String, Timer> tradeTimer = new HashMap<>();
 
 
     /**
@@ -80,12 +81,13 @@ public class Trade {
      */
     public void sendTradeRequest(Player tradeInitiator, Player tradeReceiver) {
         String msgTradeSent = parseStringMsg(core.config.getString("tradeSentMsg"), "{PLAYERTRADESENTTO}:" + tradeReceiver.getName());
+        String msgTradeAlreadySent = parseStringMsg(core.config.getString("tradeRequestAlreadySentMsg"), "{PLAYERTRADESENTTO}:" + tradeReceiver.getName());
         String msgTradeReceived = parseStringMsg(core.config.getString("tradeReceivedMsg"), "{PLAYERTRADESENTFROM}:" + tradeInitiator.getName());
         String msgCannotTradeWithSelf = parseStringMsg(core.config.getString("cannotTradeWithSelfMsg"));
         String prefix = parseStringMsg(core.config.getString("chatPrefix"));
         if (tradeInitiator != tradeReceiver) {
             if (getNearbyPlayers(tradeInitiator).contains(tradeReceiver)) {
-                if(!getTradeRequests(tradeInitiator).contains(tradeReceiver)) {
+                if(!getTradeRequests(tradeInitiator).contains(tradeReceiver) /*&& !(tradeTimer.containsKey(tradeInitiator) && tradeTimer.get(tradeInitiator).equals(tradeReceiver))*/) {
 
                     //Send messages to players informing about trade
                     tradeInitiator.sendMessage(prefix + msgTradeSent);
@@ -94,6 +96,8 @@ public class Trade {
                     requestTrade.put(tradeInitiator, tradeReceiver);
                     tradeTimer(tradeInitiator, tradeReceiver);
                     // tradeInitiator.sendMessage(requestTrade.toString());
+                } else{
+                    tradeInitiator.sendMessage(prefix + msgTradeAlreadySent);
                 }
             }
         } else {
@@ -101,23 +105,58 @@ public class Trade {
         }
     }
 
+
+
     public void tradeTimer(Player tradeInitiator, Player tradeReceiver){
         int delay = (core.config.getInt("tradeRequestTimeout") * 1000);
         int period = 1000;/*core.config.getInt("tradeCountdownTime");*/
+        String msgTradeRequestExpired = parseStringMsg(core.config.getString("tradeRequestExpiredMsg"),"{PLAYERTRADESENTTO}:" + tradeReceiver.getName());
+        String prefix = parseStringMsg(core.config.getString("chatPrefix"));
+        Timer timer;
+        if(tradeTimer.containsKey(tradeInitiator+":"+tradeReceiver)){
+            //if(tradeTimer.get(tradeInitiator) == tradeReceiver){
+                timer = tradeTimer.get(tradeInitiator+":"+tradeReceiver);
+                timer.cancel();
+                tradeTimer.remove(tradeInitiator+":"+tradeReceiver);
+
+                timer = new Timer();
+                tradeTimer.put(tradeInitiator + ":"+tradeReceiver, timer);
+                tradeCountdownTimer(tradeInitiator, tradeReceiver, delay, period, msgTradeRequestExpired, prefix, timer);
+            /*} else{
+                tradeTimer.put(tradeInitiator, tradeReceiver);
+                tradeCountdownTimer(tradeInitiator, tradeReceiver, delay, period, msgTradeRequestExpired, prefix, timer);
+            }*/
+        } else {
+            timer = new Timer();
+            tradeTimer.put(tradeInitiator+":"+tradeReceiver, timer);
+            tradeCountdownTimer(tradeInitiator, tradeReceiver, delay, period, msgTradeRequestExpired, prefix, timer);
+        }
 
 
 
 
-        Timer timer = new Timer();
+
+    }
+
+    private void tradeCountdownTimer(Player tradeInitiator, Player tradeReceiver, int delay, int period, String msgTradeRequestExpired, String prefix, Timer timer) {
         timer.schedule(new TimerTask() {
-            int n = 0;
             @Override
             public void run() {
-                requestTrade.remove(tradeInitiator, tradeReceiver);
-                timer.cancel();
+                if(!tradeInitiator.getOpenInventory().getTopInventory().equals(core.tradeGUI.tradeInventory)) {
+                    if(tradeTimer.containsKey(tradeInitiator+":"+tradeReceiver))
+                        if(tradeTimer.get(tradeInitiator+":"+tradeReceiver) == timer) {
+                            tradeTimer.remove(tradeInitiator+":"+tradeReceiver);
+                            requestTrade.remove(tradeInitiator, tradeReceiver);
+                            tradeInitiator.sendMessage(prefix + msgTradeRequestExpired);
+                            timer.cancel();
+                        }
+                } else{
+                    tradeTimer.remove(tradeInitiator+":"+tradeReceiver);
+                    requestTrade.remove(tradeInitiator, tradeReceiver);
+                    timer.cancel();
+                }
             }
         }, delay, period);
-
     }
 
     /**
